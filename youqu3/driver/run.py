@@ -4,10 +4,10 @@
 # SPDX-License-Identifier: GPL-2.0-only
 import os.path
 import pathlib
-import pytest
-import random
 import re
 import sys
+
+import pytest
 
 from youqu3 import logger, setting
 
@@ -170,8 +170,8 @@ class Run:
         )
         if self.setup_plan:
             return
-        self.gen_html()
         self.job_end_driver()
+        self.gen_html()
 
     def gen_html(self):
         os.makedirs(self.allure_html_path, exist_ok=True)
@@ -180,40 +180,17 @@ class Run:
             YouQuHtml.gen(str(self.allure_data_path), str(self.allure_html_path), clean=True)
         except ImportError:
             try:
-                from youqu3.cmd import Cmd
                 from youqu_html_rpc import YouQuHtmlRpc
-                from youqu_html_rpc.environment import environment
                 from youqu_html_rpc.config import config as html_rpc_config
-                log_server = servers = [i.strip() for i in setting.REPORT_SERVER_IP.split("/") if i]
-                while servers:
-                    html_rpc_config.SERVER_IP = random.choice(servers)
-                    if YouQuHtmlRpc.check_connected() is False:
-                        servers.remove(html_rpc_config.SERVER_IP)
-                        html_rpc_config.SERVER_IP = None
-                    else:
-                        break
-                if html_rpc_config.SERVER_IP is None:
-                    raise EnvironmentError(f"所有REPORT SERVER不可用: {log_server}")
-                report_dirname = f"{setting.TIME_STRING}_{setting.HOST_IP}_{self.rootdir.name}"
-                report_server_path = f"{setting.REPORT_BASE_PATH}/{report_dirname}"
-                report_server_data_path = f"{report_server_path}/data"
-                report_server_html_path = f"{report_server_path}/html"
-                YouQuHtmlRpc.makedirs(report_server_data_path)
-                rs_user, rs_password = YouQuHtmlRpc.server_user_password()
-                environment(self.allure_data_path)
-                logger.info(f"send data to report server: {html_rpc_config.SERVER_IP}")
-                rsync = 'rsync -av -e "ssh -o StrictHostKeyChecking=no"'
-                Cmd.expect_run(
-                    f"/bin/bash -c '{rsync} {str(self.allure_data_path)}/ {rs_user}@{html_rpc_config.SERVER_IP}:{report_server_data_path}/'",
-                    events={'password': f'{rs_password}\n'},
-                    return_code=True,
-                    timeout=6000,
+                html_rpc_config.SERVER_IP = setting.REPORT_SERVER_IP
+                YouQuHtmlRpc.environment(self.allure_data_path)
+                YouQuHtmlRpc.gen_rpc(
+                    self.allure_data_path,
+                    self.allure_html_path,
+                    setting.HOST_IP,
+                    setting.REPORT_BASE_PATH,
+                    self.rootdir.name
                 )
-                YouQuHtmlRpc.gen(report_server_data_path, report_server_html_path, report_dirname)
-                report_server_url = f"http://{html_rpc_config.SERVER_IP}/{report_dirname}"
-                logger.info(f"html report url: {report_server_url}")
-                with open(f"{self.allure_html_path}/{report_dirname}.txt", "w", encoding="utf-8") as f:
-                    f.write(report_server_url)
             except ImportError:
                 print(f"only json report")
 

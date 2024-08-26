@@ -17,7 +17,7 @@ class File:
     and query of documents.
     """
 
-    __author__ = "Mikigo <huangmingqiang@uniontech.com>, Litao <litaoa@uniontech.com>"
+    __author__ = "mikigo<huangmingqiang@uniontech.com>"
 
     @staticmethod
     def create_files(path: str, file_name: str = "", file_type: str = "dir"):
