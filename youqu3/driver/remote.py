@@ -112,6 +112,7 @@ class Remote:
 
     def send_code(self, user, _ip, password):
         logger.info(f"开始发送代码到测试机 - < {user}@{_ip} >")
+        logger.info(self.client_rootdir(user))
         RemoteCmd(user, _ip, password).remote_sudo_run(f"rm -rf {self.client_rootdir(user)}")
         RemoteCmd(user, _ip, password).remote_run(f"mkdir -p {self.client_rootdir(user)}")
         exclude = ""
@@ -134,25 +135,29 @@ class Remote:
         _, return_code = Cmd.expect_run(
             f"/bin/bash -c '{self.rsync} {exclude} {self.server_rootdir}/* {user}@{_ip}:{self.client_rootdir(user)}/'",
             events={'password': f'{password}\n'},
-            return_code=True
+            return_code=True,
+            timeout=6000,
         )
         a, return_code = Cmd.expect_run(
             f"/bin/bash -c '{self.rsync} {self.server_rootdir}/.env {user}@{_ip}:{self.client_rootdir(user)}/'",
             events={'password': f'{password}\n'},
-            return_code=True
+            return_code=True,
+            timeout=600,
         )
         logger.info(f"代码发送{'成功' if return_code == 0 else '失败'} - < {user}@{_ip} >")
 
     def install_client_env(self, user, _ip, password):
         logger.info(f"开始安装环境 - < {user}@{_ip} >")
 
-        def _remote_run(cmd):
-            return RemoteCmd(user, _ip, password).remote_run(cmd, return_code=True)
+        def _remote_run(cmd, return_code=True):
+            res, statuscode = RemoteCmd(user, _ip, password).remote_run(cmd, return_code=return_code)
+            print(res)
+            return res, statuscode
 
-        _, return_code = _remote_run("pip3 --version")
+        _, return_code = _remote_run("pip3 --version", return_code=True)
         if return_code != 0:
             _remote_run("curl -sSL https://bootstrap.pypa.io/get-pip.py -o get-pip.py && python3 get-pip.py")
-        _remote_run(f"pip3 install -U youqu3 -i {setting.PYPI_MIRROR}")
+        _remote_run(f"pip3 install -U youqu3 -i {setting.PYPI_MIRROR} --break-system-packages")
         _, return_code = _remote_run(
             f"export PATH=$PATH:$HOME/.local/bin;cd {self.client_rootdir(user)} && youqu3 envx")
         logger.info(f"环境安装{'成功' if return_code == 0 else '失败'} - < {user}@{_ip} >")
@@ -237,17 +242,17 @@ class Remote:
 
         tags_txt = self.read_tags_txt()
         if self.tags:
-            cmd.extend(["-m", f"'{self.tags}'"])
+            cmd.extend(["-t", f"'{self.tags}'"])
         elif self.txt and tags_txt is not None:
-            cmd.extend(["-m", f"'{tags_txt}'"])
+            cmd.extend(["-t", f"'{tags_txt}'"])
         if self.slaves:
             cmd.extend(["--slaves", f"'{self.slaves}'"])
         if self.reruns:
-            cmd.extend(["--reruns",self.reruns])
+            cmd.extend(["--reruns", self.reruns or setting.RERUNS])
         if self.job_start:
-            cmd.extend(["--job-start",f"'{self.job_start}'"])
+            cmd.extend(["--job-start", f"'{self.job_start}'"])
         if self.job_end:
-            cmd.extend(["--job-end",f"'{self.job_end}"])
+            cmd.extend(["--job-end", f"'{self.job_end}"])
         if self.pytest_opt:
             cmd.extend([i.strip() for i in self.pytest_opt])
         if self.record_failed_num or setting.RECORD_FAILED_NUM:
