@@ -58,6 +58,14 @@ const members = [
       { icon: 'github', link: 'https://github.com/Marszzz1116' },
     ]
   },
+  {
+    avatar: 'https://www.github.com/lu-xianseng.png',
+    name: 'lu-xianseng',
+    title: 'Developer',
+    links: [
+      { icon: 'github', link: 'https://github.com/lu-xianseng' },
+    ]
+  },
 ]
 
 </script>
