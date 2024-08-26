@@ -40,7 +40,7 @@ class RpcGui:
         self.auto_restart = auto_restart
 
     @property
-    def gui(self) -> RpcMethods:
+    def rgui(self) -> RpcMethods:
         return _rpc_gui_client(
             user=self.user,
             ip=self.ip,
