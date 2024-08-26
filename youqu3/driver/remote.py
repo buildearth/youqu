@@ -214,7 +214,7 @@ class Remote:
 
     def changedir_remote_cmd(self, user):
         return [
-            "export PATH=$PATH:$HOME/.local/bin;",
+            "export PATH=\$PATH:\$HOME/.local/bin;",
             "cd",
             f"{self.client_rootdir(user)}/",
             "&&",
@@ -259,11 +259,12 @@ class Remote:
             cmd.extend(["--record-failed-num", f"{self.record_failed_num or setting.RECORD_FAILED_NUM}"])
         return cmd
 
-    def run_test(self, user, _ip, password):
+    def run_test(self, user, _ip, password, use_sshpass=False):
         RemoteCmd(user, _ip, password).remote_run(
             " ".join(
                 self.changedir_remote_cmd(user) + self.generate_cmd
-            )
+            ),
+            use_sshpass=use_sshpass,
         )
 
     @property
@@ -291,11 +292,11 @@ class Remote:
                 clients.pop(i)
         for client in list(clients.keys())[:-1]:
             user, _ip, password = clients.get(client)
-            _p3 = executor.submit(self.run_test, user, _ip, password)
+            _p3 = executor.submit(self.run_test, user, _ip, password, True)
             _ps.append(_p3)
             sleep(1)
         user, _ip, password = list(clients.values())[-1]
-        self.run_test(user, _ip, password)
+        self.run_test(user, _ip, password, use_sshpass=True)
         wait(_ps, return_when=ALL_COMPLETED)
         sleep(5)
 
@@ -375,7 +376,7 @@ class Remote:
     def client_worker(self, client_name_list, clients):
         client_info = clients.get(client_name_list[0])
         self.send_code_and_env(*client_info)
-        self.run_test(*client_info)
+        self.run_test(*client_info, use_sshpass=True)
         self.get_back_report(*client_info)
 
     def group_client_worker(self, client_cases_map, client_name, clients):
@@ -383,5 +384,5 @@ class Remote:
         client_cases = client_cases_map.get(client_name)
         self.inside_filepath = " ".join(client_cases)
         self.send_code_and_env(*client_info)
-        self.run_test(*client_info)
+        self.run_test(*client_info, use_sshpass=True)
         self.get_back_report(*client_info)

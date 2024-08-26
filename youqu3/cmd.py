@@ -149,13 +149,28 @@ class RemoteCmd:
         self.ip = ip
         self.password = password
 
-    def remote_run(self, cmd: str, return_code: bool = False, timeout: int = None):
-        res = Cmd.expect_run(
-            f'ssh -o StrictHostKeyChecking=no {self.user}@{self.ip} "{cmd}"',
-            events={'password': f'{self.password}\n'},
-            return_code=return_code,
-            timeout=timeout
-        )
+    def remote_run(self, cmd: str, return_code: bool = False, timeout: int = None, use_sshpass: bool = False):
+        remote_cmd = f'ssh -o StrictHostKeyChecking=no {self.user}@{self.ip} "{cmd}"'
+        logger.debug(remote_cmd)
+        if use_sshpass:
+            if os.popen("command -v sshpass").read().strip() == "":
+                pkg = "apt"
+                check_pkg = os.popen("command -v apt").read().strip()
+                if check_pkg == "":
+                    pkg = "yum"
+                stdout, statuscode = Cmd.sudo_run(f"{pkg} install sshpass -y", return_code=True, timeout=30)
+                if statuscode != 0:
+                    raise EnvironmentError(
+                        f"sshpass 安装失败，请尝试添加环境变量export YOUQU_PASSWORD=<PASSWORD>或手动安装:sudo {pkg} install sshpass 后再次执行。"
+                    )
+            res = os.system(f"sshpass -p '{self.password}' {remote_cmd}")
+        else:
+            res = Cmd.expect_run(
+                remote_cmd,
+                events={'password': f'{self.password}\n'},
+                return_code=return_code,
+                timeout=timeout
+            )
         return res
 
     def remote_sudo_run(self, cmd: str, workdir: str = None, return_code: bool = False):
