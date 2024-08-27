@@ -18,9 +18,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Sync to Anolis
-        uses: wearerequired/git-mirror-action@master
-        env:
-          SSH_PRIVATE_KEY: ${{ secrets.GITEE_RSA_PRIVATE_KEY }}
-        with:
-          source-repo: git@github.com:linuxdeepin/youqu.git
-          destination-repo: git@gitee.com:anolis/youqu.git
+        run: |
+          git clone --bare https://github.com/linuxdeepin/youqu.git
+          git remote set-url origin https://myml:${{ secrets.GITEE_SYNC_TOKEN }}@gitee.com/anolis/youqu.git
+          git push -f --all --prune origin
+          git push --tags origin
