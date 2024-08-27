@@ -13,13 +13,3 @@ jobs:
   backup-to-gitee:
     uses: linuxdeepin/.github/.github/workflows/backup-to-gitee.yml@master
     secrets: inherit
-
-  build:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Sync to Anolis
-        run: |
-          git clone --bare https://github.com/linuxdeepin/youqu.git .git
-          git remote set-url origin https://myml:${{ secrets.GITEE_SYNC_TOKEN }}@gitee.com/anolis/youqu.git
-          git push -f --all --prune origin
-          git push --tags origin
