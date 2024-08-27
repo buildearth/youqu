@@ -11,7 +11,7 @@ class Cmd:
 
     @staticmethod
     def _run(command, _input=None, timeout=None, check=False, executable=None, **kwargs):
-        with subprocess.Popen(command, **kwargs) as process:
+        with subprocess.Popen(command, executable=executable, **kwargs) as process:
             try:
                 stdout, stderr = process.communicate(_input, timeout=timeout)
             except:
