@@ -14,12 +14,21 @@ pip3 config set global.index-url https://pypi.tuna.tsinghua.edu.cn/simple
 ```bash
 export PATH=$PATH:$HOME/.local/bin
 ```
-
 建议将其添加到 ~/.bashrc 里面。
+```bash
+echo "export PATH=\$PATH:\$HOME/.local/bin" >> ~/.bashrc
+source ~/.bashrc
+```
 :::
 
 ::: details 开发环境：Pycharm 添加 pipenv 虚拟环境时提示找不到 pipenv
 Pycharm 没有在环境变量中找到 pipenv，可以尝试：
+建议将其添加到 ~/.bashrc 里面。
+```bash
+echo "export PATH=\$PATH:\$HOME/.local/bin" >> ~/.bashrc
+source ~/.bashrc
+```
+或者
 ```bash
 sudo pip3 install pipenv
 ```
