@@ -124,6 +124,7 @@ class Cmd:
             password = setting.PASSWORD
         wd = ""
         if workdir:
+            workdir = os.path.expanduser(workdir)
             if not os.path.exists(workdir):
                 raise FileNotFoundError
             wd = f"cd {workdir} && "
