@@ -11,10 +11,10 @@ from concurrent.futures import ThreadPoolExecutor
 from concurrent.futures import wait
 from copy import deepcopy
 
-from youqu3 import logger
+from funnylog2 import logger
 from youqu3 import setting
 from youqu3 import sleep
-from youqu3.cmd import Cmd, RemoteCmd
+from nocmd import Cmd, RemoteCmd
 
 
 class Remote:

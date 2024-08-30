@@ -15,46 +15,17 @@ class _Setting(_DynamicSetting):
     RERUNS = os.environ.get("YOUQU_RERUNS") or 1
     RECORD_FAILED_NUM = os.environ.get("YOUQU_RECORD_FAILED_NUM") or 1
 
-    # OCR
-    OCR_NETWORK_RETRY = 1
-    OCR_PAUSE = 1
-    OCR_TIMEOUT = 5
-    OCR_MAX_MATCH_NUMBER = 100
-    OCR_PORT = 8890
-    OCR_SERVER_IP = "127.0.0.1/127.0.0.2"
-
-    # IMAGE
-    IMAGE_NETWORK_RETRY = 1
-    IMAGE_PAUSE = 1
-    IMAGE_TIMEOUT = 5
-    IMAGE_MAX_MATCH_NUMBER = 100
-    IMAGE_PORT = 8889
-    IMAGE_SERVER_IP = "127.0.0.1/127.0.0.2"
-
     # REPORT SERVER
     REPORT_SERVER_IP = "127.0.0.1/127.0.0.2"
     REPORT_PORT = 5656
     REPORT_BASE_PATH = "~/report"
 
-    # REMOTE
-
     # SLAVES
     SLAVES = os.environ.get("SLAVES")
 
-    # WEBUI
-    EXECUTABLE_PATH = f"{_DynamicSetting.HOME}/.config/browser"
-    USER_DATE_DIR = "/usr/bin/browser"
-    HEADLESS = True if os.environ.get("HEADLESS") is None else False
-
     PYPI_MIRROR = "https://pypi.tuna.tsinghua.edu.cn/simple"
 
-    @dataclasses.dataclass
-    class Sleepx:
-        x86_64: [float, int] = 1
-        aarch64: [float, int] = 1.5
-        loongarch64: [float, int] = 2
-        mips64: [float, int] = 2.5
-        sw64: [float, int] = 2.5
+
 
     @enum.unique
     class FixedCsvTitle(enum.Enum):
@@ -62,6 +33,20 @@ class _Setting(_DynamicSetting):
         skip_reason = "跳过原因"
         fixed = "确认修复"
         removed = "废弃用例"
+
+    @enum.unique
+    class ConfStr(enum.Enum):
+        SKIP = "skip"
+        SKIPIF = "skipif"
+        FIXED = "fixed"
+        PASSED = "passed"
+        FAILED = "failed"
+        SKIPPED = "skipped"
+        REMOVED = "removed"
+        SKIP_INDEX = "skip_index"
+        FIXED_INDEX = "fixed_index"
+        REMOVED_INDEX = "removed_index"
+        PMS_ID_INDEX = "pms_id_index"
 
 
 setting = _Setting()

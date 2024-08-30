@@ -9,7 +9,8 @@ import sys
 
 import pytest
 
-from youqu3 import logger, setting
+from youqu3 import setting
+from funnylog2 import logger
 
 
 class Run:

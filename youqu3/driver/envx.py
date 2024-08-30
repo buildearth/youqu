@@ -2,9 +2,9 @@ import os.path
 import pathlib
 
 from youqu3 import exceptions
-from youqu3 import logger
+from funnylog2 import logger
 from youqu3 import setting
-from youqu3.cmd import Cmd
+from nocmd import Cmd
 
 
 def cli_cmd_creator(cmd_name, cmd_txt):
