@@ -1,6 +1,6 @@
 <p align="center">
   <a href="https://github.com/linuxdeepin/youqu">
-    <img src="./docs/assets/logo.png" width="100" alt="YouQu3">
+    <img src="./assets/logo.png" width="100" alt="YouQu3">
   </a>
 </p>
 <h1 align="center">YouQu3</h1>
